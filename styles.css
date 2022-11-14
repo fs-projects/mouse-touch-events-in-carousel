@@ -16,6 +16,9 @@ html {
   height: 100vh;
   display: inline-flex;
   overflow: hidden;
+  transform: translateX(0);
+  transition: transform 0.3s ease-out;
+  cursor: grab;
 }
 
 .product {
@@ -25,15 +28,13 @@ html {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: grab;
   user-select: none;
-  transform: translateX(0);
-  transition: tranform 0.3 ease-out;
 }
 
 .product img {
   max-height: 60%;
   max-width: 100%;
+  transition: tranform 0.3 ease-out;
 }
 
 .grabbing {

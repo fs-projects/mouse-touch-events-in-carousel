@@ -1,9 +1,18 @@
+const sliderContainer = document.querySelector('.container');
 const slideElement = document.querySelectorAll('.product');
 let isDragging = false;
+let startPos = 0;
+let currentIndex = 0;
+let currentTranslate = 0;
+let previousTranslate = 0;
+let animationId = null;
 Array.from(slideElement).forEach((el, index) => {
-  el.addEventListener('dragstart', dragStart);
-  el.addEventListener('dragend', dragEnd);
-  el.addEventListener('touchstart', touchStart);
+  const slideImage = el.querySelector('img');
+  slideImage.addEventListener('dragstart', (e) => e.preventDefault());
+
+  // el.addEventListener('dragstart', dragStart);
+  // el.addEventListener('dragend', dragEnd);
+  el.addEventListener('touchstart', touchStart(index));
   el.addEventListener('touchmove', touchMove);
   el.addEventListener('touchend', touchEnd);
   el.addEventListener('mouseup', mouseUp);
@@ -12,23 +21,41 @@ Array.from(slideElement).forEach((el, index) => {
   el.addEventListener('mouseleave', mouseLeave);
 });
 
-function dragStart() {
-  isDragging = true;
-  console.log('drag start');
+function getCurrentPositionX(event) {
+  return event.type.includes('mouse') ? event.pageY : event.touches[0].clientX;
 }
 
-function dragEnd() {
-  isDragging = false;
-  console.log('drag end');
+// function dragStart() {
+//   isDragging = true;
+//   console.log('drag start');
+// }
+
+// function dragEnd() {
+//   isDragging = false;
+//   console.log('drag end');
+// }
+
+function touchStart(index) {
+  return function (event) {
+    console.log(`${event.type}`);
+    isDragging = true;
+    currentIndex = index;
+    startPos = getCurrentPositionX(event);
+    console.log('start position', startPos);
+    animationId = requestAnimationFrame(animation);
+  };
 }
 
-function touchStart() {
-  console.log('touch start');
+function animation() {
+  sliderContainer.style.transform = `translateX(${currentTranslate}px)`;
+  if (isDragging) requestAnimationFrame(animation);
 }
 
-function touchMove() {
+function touchMove(event) {
   if (isDragging) {
-    console.log('touch move while dragging');
+    console.log(`${event.type} move while dragging`);
+    const currentPosition = getCurrentPositionX(event);
+    currentTranslate = previousTranslate + currentPosition - startPos;
   }
 }
 
@@ -38,9 +65,11 @@ function touchEnd() {
 
 function mouseUp() {
   console.log('mouse up');
+  isDragging = false;
 }
 
 function mouseDown() {
+  isDragging = true;
   console.log('mouse down');
 }
 
