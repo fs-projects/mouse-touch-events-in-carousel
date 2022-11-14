@@ -35,6 +35,16 @@ function getCurrentPositionX(event) {
 //   console.log('drag end');
 // }
 
+function setSliderPosition() {
+  sliderContainer.style.transform = `translateX(${currentTranslate}px)`;
+}
+
+function animation() {
+  // console.log("1111", currentTranslate)
+  setSliderPosition();
+  if (isDragging) requestAnimationFrame(animation);
+}
+
 function touchStart(index) {
   return function (event) {
     console.log(`${event.type}`);
@@ -43,24 +53,37 @@ function touchStart(index) {
     startPos = getCurrentPositionX(event);
     console.log('start position', startPos);
     animationId = requestAnimationFrame(animation);
+    sliderContainer.classList.add('grabbing');
   };
-}
-
-function animation() {
-  sliderContainer.style.transform = `translateX(${currentTranslate}px)`;
-  if (isDragging) requestAnimationFrame(animation);
 }
 
 function touchMove(event) {
   if (isDragging) {
-    console.log(`${event.type} move while dragging`);
+    // console.log(`${event.type} move while dragging`);
     const currentPosition = getCurrentPositionX(event);
     currentTranslate = previousTranslate + currentPosition - startPos;
   }
 }
 
+function setPositionByIndex() {
+  currentTranslate = currentIndex * -window.innerWidth;
+  previousTranslate = currentTranslate;
+  setSliderPosition();
+}
+
 function touchEnd() {
   console.log('touch end');
+  cancelAnimationFrame(animationId);
+  const movedBy = currentTranslate - previousTranslate;
+
+  if (movedBy < -100 && currentIndex < slideElement.length - 1)
+    currentIndex += 1;
+
+  if (movedBy > 100 && currentIndex > 0) currentIndex -= 1;
+
+  setPositionByIndex();
+
+  sliderContainer.classList.remove('grabbing');
 }
 
 function mouseUp() {
